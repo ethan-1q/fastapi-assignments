@@ -1,0 +1,19 @@
+apiVersion: networking.k8s.io/v1beta1
+kind: Ingress
+metadata:
+  name: fastapi-assignments
+  annotations:
+    nginx.ingress.kubernetes.io/ssl-redirect: "false"
+spec:
+  tls:
+    - hosts:
+        - ethan-fastapi-assignments.devel.kakao.com
+      secretName: fastapi-assignments-ssl
+  rules:
+  - host: ethan-fastapi-assignments.devel.kakao.com
+    http:
+      paths:
+      - path: /
+        backend:
+          serviceName: fastapi-assignments
+          servicePort: 80

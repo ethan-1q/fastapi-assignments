@@ -1,0 +1,59 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: fastapi-assignments
+  name: fastapi-assignments
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: fastapi-assignments
+  template:
+    metadata:
+      labels:
+        app: fastapi-assignments
+    spec:
+      containers:
+        - name: fastapi-assignments
+          image: idock.daumkakao.io/ethan.1q/fastapi-assignments-app:latest
+          imagePullPolicy: Always
+          env:
+            - name: VAULT_HOST
+              value: https://vault-beta.daumkakao.io/v1
+            - name: VAULT_ICP_DB_KEY
+              value: secret/fastapi-assignments/fastapi-assignments-db/icp_db
+            - name: VAULT_TOKEN
+              valueFrom:
+                secretKeyRef:
+                  name: fastapi-assignments-vault
+                  key: TOKEN
+#            - name: MYSQL_USER
+#              value: icp
+#            - name: MYSQL_PASSWORD
+#              valueFrom:
+#                secretKeyRef:
+#                  name: fastapi-assignments-secrets
+#                  key: MYSQL_PASSWORD
+#            - name: MYSQL_HOST
+#              value: sandbox-icp-db.ay1.krane.9rum.cc
+#            - name: MYSQL_PATH
+#              value: "/icp"
+            - name: MYSQL2_USER
+              value: fastapi
+            - name: MYSQL2_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: fastapi-assignments-secrets
+                  key: MYSQL2_PASSWORD
+            - name: MYSQL2_HOST
+              value: ethan-fastapi-assignments.ay1.krane.9rum.cc
+            - name: MYSQL2_PATH
+              value: "/fastapi_assignments"
+          resources:
+              limits:
+                  cpu: 500m
+                  memory: 250Mi
+              requests:
+                  cpu: 500m
+                  memory: 250Mi

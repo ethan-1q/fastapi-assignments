@@ -1,0 +1,12 @@
+__pycache__
+.idea
+.pytest_cache
+
+.env
+
+icp.db
+icp.db-shm
+icp.db-wal
+my.db
+my.db-shm
+my.db-wal

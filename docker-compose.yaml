@@ -1,0 +1,23 @@
+version: "3.8"
+
+services:
+#  db:
+#    container_name: mysql
+#    image: idock.daumkakao.io/ethan.1q/fastapi-assignments-db:latest
+#    ports:
+#      - "3306:3306"
+#    environment:
+#      MYSQL_ALLOW_EMPTY_PASSWORD: 'true'
+#    volumes:
+#      - "./sql/:/docker-entrypoint-initdb.d/"
+
+  app:
+    restart: always
+    container_name: fastapi-app
+    image: idock.daumkakao.io/ethan.1q/fastapi-assignments-app:latest
+    env_file:
+      - .env
+    ports:
+      - "80:80"
+#    depends_on:
+#      - db
