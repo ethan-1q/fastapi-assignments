@@ -4,7 +4,7 @@ from typing import Any, Dict, List, Optional, Union
 from pydantic import AnyHttpUrl, BaseSettings, validator, AnyUrl
 from pydantic.tools import lru_cache
 
-from app.core.vault import get_vault_secrets
+from app.core.vault import get_vault_secrets, load_vault_secrets_from_vault_file, save_vault_secrets_to_vault_file
 
 
 class MysqlDsn(AnyUrl):
@@ -40,24 +40,31 @@ class Settings(BaseSettings):
         if isinstance(v, str):
             return v
 
-        vault_data = get_vault_secrets(values.get('VAULT_ICP_DB_KEY'), values.get('VAULT_TOKEN'))
+        vault_key = values.get('VAULT_ICP_DB_KEY')
+        vault_token = values.get('VAULT_TOKEN')
+
+        db_info = {
+            'user': values.get('ICP_MYSQL_USER'),
+            'password': values.get('ICP_MYSQL_PASSWORD'),
+            'host': values.get('ICP_MYSQL_HOST'),
+            'path': values.get('ICP_MYSQL_PATH')
+        }
+
+        vault_data = get_vault_secrets(vault_key, vault_token)
         if vault_data:
-            user = vault_data['user']
-            password = vault_data['password']
-            host = vault_data['host']
-            path = vault_data['path']
+            save_vault_secrets_to_vault_file(vault_data, vault_key)
+            db_info = vault_data
         else:
-            user = values.get('ICP_MYSQL_USER')
-            password = values.get('ICP_MYSQL_PASSWORD')
-            host = values.get('ICP_MYSQL_HOST')
-            path = values.get('ICP_MYSQL_PATH')
+            vault_data = load_vault_secrets_from_vault_file(vault_key)
+            if vault_data:
+                db_info = vault_data
 
         return MysqlDsn.build(
             scheme="mysql",
-            user=user,
-            password=password,
-            host=host,
-            path=path
+            user=db_info['user'],
+            password=db_info['password'],
+            host=db_info['host'],
+            path=db_info['path']
         )
 
     MY_MYSQL_USER: str = ''
@@ -71,24 +78,33 @@ class Settings(BaseSettings):
         if isinstance(v, str):
             return v
 
-        vault_data = get_vault_secrets(values.get('VAULT_MY_DB_KEY'), values.get('VAULT_TOKEN'))
-        if vault_data:
-            user = vault_data['user']
-            password = vault_data['password']
-            host = vault_data['host']
-            path = vault_data['path']
-        else:
-            user = values.get('MY_MYSQL_USER')
-            password = values.get('MY_MYSQL_PASSWORD')
-            host = values.get('MY_MYSQL_HOST')
-            path = values.get('MY_MYSQL_PATH')
+        vault_key = values.get('VAULT_MY_DB_KEY')
+        vault_token = values.get('VAULT_TOKEN')
 
+        db_info = {
+            'user': values.get('MY_MYSQL_USER'),
+            'password': values.get('MY_MYSQL_PASSWORD'),
+            'host': values.get('MY_MYSQL_HOST'),
+            'path': values.get('MY_MYSQL_PATH')
+        }
+
+        vault_data = get_vault_secrets(vault_key, vault_token)
+        if vault_data:
+            save_vault_secrets_to_vault_file(vault_data, vault_key)
+            db_info = vault_data
+        else:
+            print(vault_key)
+            vault_data = load_vault_secrets_from_vault_file(vault_key)
+            if vault_data:
+                db_info = vault_data
+
+        print('-----------------', db_info)
         return MysqlDsn.build(
             scheme="mysql",
-            user=user,
-            password=password,
-            host=host,
-            path=path
+            user=db_info['user'],
+            password=db_info['password'],
+            host=db_info['host'],
+            path=db_info['path']
         )
 
     GENERATE_SCHEMAS: bool = False
