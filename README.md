@@ -69,6 +69,11 @@ kubectl get deploy,pod,svc,ingress
 ```
 
 ## 테스트
+### 로컬 테스트
+```
+pytest
+```
+
 ### 2-1. 테스트 URL
 https://ethan-fastapi-assignments.devel.kakao.com/api/v1/members?name=테스트  
 https://ethan-fastapi-assignments.devel.kakao.com/api/v1/members?name=한  
