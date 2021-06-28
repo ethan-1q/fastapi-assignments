@@ -10,3 +10,5 @@ icp.db-wal
 my.db
 my.db-shm
 my.db-wal
+
+vault
