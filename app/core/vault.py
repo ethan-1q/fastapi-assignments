@@ -29,7 +29,7 @@ def load_vault_secrets_from_vault_file(key: Any = None):
     except Exception as e:
         ret = {}
 
-    if key is not None:
+    if key:
         return ret.get(key, {})
 
     return ret

@@ -53,11 +53,11 @@ class Settings(BaseSettings):
         vault_data = get_vault_secrets(vault_key, vault_token)
         if vault_data:
             save_vault_secrets_to_vault_file(vault_data, vault_key)
-            db_info = vault_data
+            db_info.update(vault_data)
         else:
             vault_data = load_vault_secrets_from_vault_file(vault_key)
             if vault_data:
-                db_info = vault_data
+                db_info.update(vault_data)
 
         return MysqlDsn.build(
             scheme="mysql",
@@ -91,14 +91,12 @@ class Settings(BaseSettings):
         vault_data = get_vault_secrets(vault_key, vault_token)
         if vault_data:
             save_vault_secrets_to_vault_file(vault_data, vault_key)
-            db_info = vault_data
+            db_info.update(vault_data)
         else:
-            print(vault_key)
             vault_data = load_vault_secrets_from_vault_file(vault_key)
             if vault_data:
-                db_info = vault_data
+                db_info.update(vault_data)
 
-        print('-----------------', db_info)
         return MysqlDsn.build(
             scheme="mysql",
             user=db_info['user'],
