@@ -9,7 +9,6 @@ from tortoise.contrib.test import finalizer, initializer, _init_db
 
 from ..core.settings import Settings
 from ..core.fastapi import get_application
-from ..core.database import setup_database
 from ..app.models import krew, member
 
 
@@ -24,17 +23,28 @@ def settings():
     return settings
 
 
-# TODO: 다중 DB 연결?
-# @pytest.fixture(scope="function")
-# def client(request, settings) -> Generator:
-#     initializer([member], db_url=settings.ICP_DATABASE_URL, app_label="member")
-#
-#     app = get_application(settings)
-#
-#     with TestClient(app) as client:
-#         yield client
-#
-#     request.addfinalizer(finalizer)
+@pytest.fixture(scope="function")
+def member_client(request, settings) -> Generator:
+    initializer([member], db_url=settings.ICP_DATABASE_URL, app_label="member")
+
+    app = get_application(settings)
+
+    with TestClient(app) as client:
+        yield client
+
+    request.addfinalizer(finalizer)
+
+
+@pytest.fixture(scope="function")
+def krew_client(request, settings) -> Generator:
+    initializer([krew], db_url=settings.MY_DATABASE_URL, app_label="krew")
+
+    app = get_application(settings)
+
+    with TestClient(app) as client:
+        yield client
+
+    request.addfinalizer(finalizer)
 
 
 @pytest.fixture(scope="function")
